@@ -5,51 +5,91 @@ pygame.init()
 pygame.font.init()
 pygame.mixer.init()
 
+game_active = True
+
+pygame.display.set_caption("Reflex Game")
+
 #music
-pygame.mixer.music.load("muzyka1.mp3")
+pygame.mixer.music.load("music.mp3")
 pygame.mixer.music.set_volume(0.7)
 pygame.mixer.music.play(loops=True)
 
-#grit and screen init
+points_gained = 0
+
+
+font = pygame.font.Font("font.ttf", 80)
+text = font.render(str(points_gained), False, (255,255,255))
+textRect = text.get_rect()
+textRect.center = (500, 50)
+
+
 cell_size = 20
 screen_size = (cell_size*50, cell_size*40)
 screen = pygame.display.set_mode((screen_size))
 
 clock = pygame.time.Clock()
-#drawing point
+
 point = pygame.Rect(random.randint(1, 49) * cell_size, random.randint(1, 39) * cell_size, cell_size, cell_size)
 touching = True
 
-points_gained = 0
-
-
 counter_start = time.time()
 while True:
-    counter = time.time()
+
     mouse_x, mouse_y = pygame.mouse.get_pos()
     if mouse_x in range(point.x, point.x + 20) and mouse_y in range(point.y, point.y + 20):
         touching = True
     else:
         touching = False
 
-    time_left = round(counter - counter_start,2)
+    if game_active:
+        counter = time.time()
+        time_left = round(counter - counter_start, 2)
 
-    
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            sys.exit()
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if touching is True:
+        if int(time_left) == 10:
+            time_stop = counter
+            game_active = False
+
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if touching:
+                    point = pygame.Rect(random.randint(1, 49) * cell_size, random.randint(1, 39) * cell_size, cell_size,cell_size)
+                    points_gained += 1
+                    text = font.render(str(points_gained), True, (255, 255, 255))
+                    textRect = text.get_rect()
+                    textRect.center = (500, 50)
+
+
+    else:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                counter = time_stop
+                game_active = True
+                pygame.mixer.music.play()
+                points_gained = 0
+                text = font.render(str(points_gained), True, (255, 255, 255))
+                textRect = text.get_rect()
+                textRect.center = (500, 50)
                 point = pygame.Rect(random.randint(1, 49) * cell_size, random.randint(1, 39) * cell_size, cell_size,cell_size)
-                points_gained += 1
+                counter_start = counter_start + 10
 
 
-    if int(time_left) == 60:
-        print(points_gained)
-        sys.exit()
 
-    screen.fill('black')
-    pygame.draw.rect(screen, 'red', point)
-    pygame.display.update()
+
+    if game_active:
+        screen.fill('black')
+        screen.blit(text, textRect)
+        point_surface = pygame.draw.rect(screen, 'red', point)
+        pygame.display.update()
+    else:
+        screen.fill('Red')
+        pygame.display.update()
+        pygame.mixer.music.stop()
+
+
 
     clock.tick(60)
