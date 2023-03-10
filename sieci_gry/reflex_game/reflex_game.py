@@ -34,21 +34,20 @@ touching = True
 
 counter_start = time.time()
 while True:
-
-    mouse_x, mouse_y = pygame.mouse.get_pos()
-    if mouse_x in range(point.x, point.x + 20) and mouse_y in range(point.y, point.y + 20):
-        touching = True
-    else:
-        touching = False
-
     if game_active:
+
         counter = time.time()
         time_left = round(counter - counter_start, 2)
 
         if int(time_left) == 10:
-            time_stop = counter
             game_active = False
+            print(counter_start, "----------", counter)
 
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        if mouse_x in range(point.x, point.x + 20) and mouse_y in range(point.y, point.y + 20):
+            touching = True
+        else:
+            touching = False
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -61,35 +60,31 @@ while True:
                     textRect = text.get_rect()
                     textRect.center = (500, 50)
 
+        screen.fill('black')
+        screen.blit(text, textRect)
+        point_surface = pygame.draw.rect(screen, 'red', point)
+        pygame.display.update()
+
 
     else:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
             if event.type == pygame.KEYDOWN:
-                counter = time_stop
                 game_active = True
-                pygame.mixer.music.play()
+                pygame.mixer.music.unpause()
+                print(pygame.mixer.music.get_busy())
+                pygame.mixer.music.set_volume(0.7)
                 points_gained = 0
                 text = font.render(str(points_gained), True, (255, 255, 255))
                 textRect = text.get_rect()
                 textRect.center = (500, 50)
                 point = pygame.Rect(random.randint(1, 49) * cell_size, random.randint(1, 39) * cell_size, cell_size,cell_size)
-                counter_start = counter_start + 10
+                counter_start = time.time()
 
 
-
-
-    if game_active:
-        screen.fill('black')
-        screen.blit(text, textRect)
-        point_surface = pygame.draw.rect(screen, 'red', point)
-        pygame.display.update()
-    else:
         screen.fill('Red')
+        pygame.mixer.music.pause()
         pygame.display.update()
-        pygame.mixer.music.stop()
-
-
 
     clock.tick(60)
