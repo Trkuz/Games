@@ -8,7 +8,7 @@ game_active = True
 
 pygame.display.set_caption("Reflex Game")
 
-pygame.mixer.music.load("music.mp3")
+pygame.mixer.music.load("muzyka1.mp3")
 pygame.mixer.music.set_volume(0.7)
 pygame.mixer.music.play(loops=True)
 
@@ -47,7 +47,6 @@ while True:
         text3 = font1.render(f"Time left: {display_time}", False, (255,255,255))
         textRect3 = text3.get_rect()
         textRect3.center = (600, 50)
-        print(display_time)
 
         if int(time_left) == 10:
             pygame.mixer.music.pause()
