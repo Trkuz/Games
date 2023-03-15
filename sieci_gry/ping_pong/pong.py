@@ -10,11 +10,11 @@ Clock = pygame.time.Clock()
 game_active = True
 screen = pygame.display.set_mode((700,500))
 
-class Game:
 
-    class Player1:
+class Player1:
         def __init__(self, name):
             self.name = name
+            self.points = 0
 
         player = pygame.Rect(10, 250, 10, 50)
 
@@ -22,9 +22,10 @@ class Game:
             pygame.draw.rect(screen, 'white', self.player)
 
 
-    class Player2:
+class Player2:
         def __init__(self, name):
             self.name = name
+            self.points = 0
 
         player = pygame.Rect(680, 250, 10, 50)
 
@@ -33,99 +34,85 @@ class Game:
 
 
 
-    class Ball:
-        def __init__(self):
+class Ball:
+    def __init__(self):
             pass
 
-        size = 20
-        starting_direction = random.choice([1,1,1,1])
-        ball = pygame.Rect(350, 200, size, size)
+    size = 20
+    starting_direction = random.choice([1,1,1,1])
+    ball = pygame.Rect(350, 200, size, size)
 
-        velocity_x = 3
-        velocity_y = 3
+    velocity_x = 5
+    velocity_y = 5
 
-        def draw_ball(self):
-            pygame.draw.rect(screen, (0, 255, 0), self.ball)
+    def draw_ball(self):
+        pygame.draw.rect(screen, (0, 255, 0), self.ball)
 
+    def move_ball(self,):
+        if self.starting_direction == 1:
+            self.ball.x -= self.velocity_x
+            self.ball.y -= self.velocity_y
+        if self.starting_direction == 2:
+            self.ball.x -= self.velocity_x
+            self.ball.y += self.velocity_y
+        if self.starting_direction == 3:
+            self.ball.x += self.velocity_x
+            self.ball.y -= self.velocity_y
+        if self.starting_direction == 4:
+            self.ball.x += self.velocity_x
+            self.ball.y += self.velocity_y
 
-        def move_ball(self):
+        if self.ball.top <=0 or self.ball.bottom >= 500 :
+            self.velocity_y *= -1
+        if self.ball.colliderect(player1.player) or self.ball.colliderect(player2.player):
+            self.velocity_x *= -1
 
-            #print("top: ", self.ball.top,"bottom: ", self.ball.bottom, "right: ", self.ball.right, "left: ",self.ball.left, end="\n")
-            print(self.ball.x,":::::::", self.ball.y)
-            print(self.starting_direction)
-            if self.starting_direction == 1:
-                self.ball.x -= self.velocity_x
-                self.ball.y -= self.velocity_y
-            if self.starting_direction == 2:
-                self.ball.x -= self.velocity_x
-                self.ball.y += self.velocity_y
-            if self.starting_direction == 3:
-                self.ball.x += self.velocity_x
-                self.ball.y -= self.velocity_y
-            if self.starting_direction == 4:
-                self.ball.x += self.velocity_x
-                self.ball.y += self.velocity_y
+        if self.ball.right >= 700:
+            player1.points +=1
+            game_active = False
+            #print('dsa')
+            return game_active
 
-            #print(self.ball.x, "----------", self.y)
+        if self.ball.left <= 0:
+            player2.points +=1
+            game_active = False
+            #print('asd')
+            return game_active
 
+#-------------------------------------------------------------------
+player1 = Player1('Josh')
+player2 = Player2('Marcin')
+ball = Ball()
 
-
-
-    def game_active(self):
+while True:
+    print(game_active)
+    if game_active:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
 
-        player1 = Game.Player1('Josh')
-        player2 = Game.Player2('Marcin')
-        ball = Game.Ball()
+        if Player1.player.bottom < 500:
+            if pygame.key.get_pressed()[pygame.K_x]:
+                Player1.player.y += 4
+        if Player1.player.top > 0:
+            if pygame.key.get_pressed()[pygame.K_w]:
+                Player1.player.y -= 4
+
+        if Player2.player.top > 0:
+            if pygame.key.get_pressed()[pygame.K_UP]:
+                Player2.player.y -= 4
+        if Player2.player.bottom < 500:
+            if pygame.key.get_pressed()[pygame.K_DOWN]:
+                Player2.player.y += 4
 
         screen.fill('black')
-
-
         player1.draw_player()
         player2.draw_player()
-        self.move_player()
-
+        print(game_active)
         ball.move_ball()
         ball.draw_ball()
-
-
-
         pygame.display.update()
         Clock.tick(60)
-
-    def game_over(self):
-        pass
-
-    def move_player(self):
-        if self.Player1.player.bottom < 500:
-            if pygame.key.get_pressed()[pygame.K_x]:
-                self.Player1.player.y += 4
-        if self.Player1.player.top > 0:
-            if pygame.key.get_pressed()[pygame.K_w]:
-                self.Player1.player.y -= 4
-
-        if self.Player2.player.top > 0:
-            if pygame.key.get_pressed()[pygame.K_UP]:
-                self.Player2.player.y -= 4
-        if self.Player2.player.bottom < 500:
-            if pygame.key.get_pressed()[pygame.K_DOWN]:
-                self.Player2.player.y += 4
-
-    def movement(self):
-        pass
-
-    def event_loop(self):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                sys.exit()
-
-game = Game()
-while True:
-    if game_active:
-        game.game_active()
-        game.event_loop()
-
     else:
-        pass
+        time.sleep(2)
+        game_active = True
