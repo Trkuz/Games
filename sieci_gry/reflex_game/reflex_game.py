@@ -1,160 +1,104 @@
-import pygame
-import time,sys
+import pygame, sys
 import random
-
+import time
 pygame.init()
-pygame.mixer.init()
 pygame.font.init()
+pygame.mixer.init()
+game_active = True
 
-Clock = pygame.time.Clock()
-screen = pygame.display.set_mode((700,500))
+pygame.display.set_caption("Reflex Game")
 
-font1 = pygame.font.Font('font.ttf', 80)
-font2 = pygame.font.Font('font.ttf', 80)
+pygame.mixer.music.load("muzyka1.mp3")
+pygame.mixer.music.set_volume(0.7)
+pygame.mixer.music.play(loops=True)
 
+points_gained = 0
 
+font1 = pygame.font.Font("font.ttf", 80)
+text1 = font1.render(str(points_gained), False, (72,251,0))
+textRect1 = text1.get_rect()
+textRect1.center = (100, 50)
 
-class Player1:
-        def __init__(self, name):
-            self.name = name
-            self.points = 0
-
-        player = pygame.Rect(10, 250, 10, 50)
-
-        def draw_player(self):
-            pygame.draw.rect(screen, 'white', self.player)
-
-
-class Player2:
-        def __init__(self, name):
-            self.name = name
-            self.points = 0
-
-        player = pygame.Rect(680, 250, 10, 50)
-
-        def draw_player(self):
-            pygame.draw.rect(screen, 'white', self.player)
+font2 = pygame.font.Font("font.ttf", 120)
+text2 = font2.render("GAME OVER", False, (255,0,0))
+textRect2 = text2.get_rect()
+font3 = pygame.font.Font("font.ttf", 50)
+text5 = font3.render("PRESS SPACE TO PLAY AGAIN", False, (0,0,255))
+textRect5 = text5.get_rect()
 
 
 
-class Ball:
-    def __init__(self):
-            pass
+cell_size = 20
+screen_size = (cell_size*50, cell_size*40)
+screen = pygame.display.set_mode((screen_size))
+clock = pygame.time.Clock()
+point = pygame.Rect(random.randint(1, 49) * cell_size, random.randint(1, 39) * cell_size, cell_size, cell_size)
+touching = True
+timer = 10
 
-    game_active = True
-    size = 20
-    starting_direction = random.choice([1,2,3,4])
-    ball = pygame.Rect(350, 200, size, size)
-
-    velocity_x = 3
-    velocity_y = 3
-
-    def draw_ball(self):
-        pygame.draw.rect(screen, (0, 255, 0), self.ball)
-
-    def move_ball(self,):
-        if self.starting_direction == 1:
-            self.ball.x -= self.velocity_x
-            self.ball.y -= self.velocity_y
-        if self.starting_direction == 2:
-            self.ball.x -= self.velocity_x
-            self.ball.y += self.velocity_y
-        if self.starting_direction == 3:
-            self.ball.x += self.velocity_x
-            self.ball.y -= self.velocity_y
-        if self.starting_direction == 4:
-            self.ball.x += self.velocity_x
-            self.ball.y += self.velocity_y
-
-        if self.ball.top <=0 or self.ball.bottom >= 500 :
-            self.velocity_y *= -1
-        if self.ball.colliderect(player1.player) or self.ball.colliderect(player2.player):
-            self.velocity_x *= -1
-
-        if self.ball.right >= 700:
-            player1.points +=1
-            print("Player1: ", player1.points,"     ", end=" ")
-            print("Player2: ", player2.points)
-            self.game_active = False
-
-        if self.ball.left <= 0:
-            player2.points +=1
-            print("Player 1: ", player1.points,"     ", end = " ")
-            print("Player 2: ", player2.points,)
-            self.game_active = False
-
-#-------------------------------------------------------------------
-player1 = Player1('Josh')
-player2 = Player2('Marcin')
-ball = Ball()
-
-def display_points():
-    player1_points_display = font1.render(str(player1.points), False, (0,0,255))
-    player2_points_display = font1.render(str(player2.points), False, (255,0,0))
-    player1_pointsRect = player1_points_display.get_rect()
-    player2_pointsRect = player2_points_display.get_rect()
-    player1_pointsRect.center = (200,200)
-    player2_pointsRect.center = (500,200)
-    screen.blit(player1_points_display, player1_pointsRect)
-    screen.blit(player2_points_display, player2_pointsRect)
-
-def game_over():
-    screen.fill('black')
-    if player1.points == 5:
-        player_won = font2.render(f"Player1({player1.name})  won!", False, (155,0,179))
-    if player2.points == 5:
-        player_won = font2.render(f"Player2({player2.name}) won!", False, (155,0,179))
-
-    player_wonRect = player_won.get_rect()
-    player_wonRect.center = (350, 250)
-    screen.blit(player_won, player_wonRect)
-
-    press_space = font1.render("Press space to play again!", False, (0,255,0))
-    press_spaceRect = play_again.get_rect()
-    press_spaceRect.center = (350,350)
-    screen.blit(press_space, press_spaceRect)
-    pygame.display.update()
-
+counter_start = time.time()
 while True:
-    if ball.game_active:
+
+    if game_active:
+
+        counter = time.time()
+        time_left = round(counter - counter_start, 2)
+        display_time = round(timer-time_left, 1)
+        text3 = font1.render(f"Time left: {display_time}", False, (255,255,255))
+        textRect3 = text3.get_rect()
+        textRect3.center = (600, 50)
+        print(display_time)
+
+        if int(time_left) == 10:
+            pygame.mixer.music.pause()
+            game_active = False
+
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        if mouse_x in range(point.x, point.x + 20) and mouse_y in range(point.y, point.y + 20):
+            touching = True
+        else:
+            touching = False
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
-
-        player_velocity = 5
-
-        if Player1.player.bottom < 500:
-            if pygame.key.get_pressed()[pygame.K_x]:
-                Player1.player.y += player_velocity
-        if Player1.player.top > 0:
-            if pygame.key.get_pressed()[pygame.K_w]:
-                Player1.player.y -= player_velocity
-
-        if Player2.player.top > 0:
-            if pygame.key.get_pressed()[pygame.K_UP]:
-                Player2.player.y -= player_velocity
-        if Player2.player.bottom < 500:
-            if pygame.key.get_pressed()[pygame.K_DOWN]:
-                Player2.player.y += player_velocity
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if touching:
+                    point = pygame.Rect(random.randint(1, 49) * cell_size, random.randint(1, 39) * cell_size, cell_size,cell_size)
+                    points_gained += 1
+                    text1 = font1.render(str(points_gained), True, (72,251,0))
+                    textRect1 = text1.get_rect()
+                    textRect1.center = (100, 50)
 
         screen.fill('black')
-        player1.draw_player()
-        player2.draw_player()
-        ball.move_ball()
-        ball.draw_ball()
+        screen.blit(text1, textRect1)
+        screen.blit(text3, textRect3)
+        point_surface = pygame.draw.rect(screen, 'red', point)
         pygame.display.update()
-        Clock.tick(60)
+
     else:
-        screen.fill((0,0,0))
-        display_points()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                game_active = True
+                pygame.mixer.music.play()
+                points_gained = 0
+                text1 = font1.render(str(points_gained), True, (72,251,0))
+                textRect1 = text1.get_rect()
+                textRect1.center = (100, 50)
+                point = pygame.Rect(random.randint(1, 49) * cell_size, random.randint(1, 39) * cell_size, cell_size,cell_size)
+                counter_start = time.time()
+
+
+        screen.fill('black')
+        text4 = font2.render(f"score: {str(points_gained)}", False, (72,251,0))
+        textRect4 = text4.get_rect()
+        textRect2.center = (500, 300)
+        textRect4.center = (500,400)
+        textRect5.center = (500,500)
+        screen.blit(text2, textRect2)
+        screen.blit(text4, textRect4)
+        screen.blit(text5, textRect5)
         pygame.display.update()
-        time.sleep(2)
-        ball.ball.x = 350
-        ball.ball.y = 250
-        if player1.points < 5 and player2.points < 5:
-            ball.game_active = True
-        else:
-            game_over()
-            pygame.display.update()
-            time.sleep(4)
-            sys.exit()
+
+    clock.tick(60)
