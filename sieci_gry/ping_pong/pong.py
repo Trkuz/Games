@@ -73,20 +73,37 @@ class Ball:
 
         if self.ball.right >= 700:
             player1.points +=1
-            print("Player1: ", player1.points,"     ", end=" ")
-            print("Player2: ", player2.points)
-            self.game_active = False
+            screen.fill((0, 0, 0))
+            display_points()
+            pygame.display.update()
+            time.sleep(2)
+            ball.ball.x = 350
+            ball.ball.y = 250
 
         if self.ball.left <= 0:
             player2.points +=1
-            print("Player 1: ", player1.points,"     ", end = " ")
-            print("Player 2: ", player2.points,)
-            self.game_active = False
+            screen.fill((0, 0, 0))
+            display_points()
+            pygame.display.update()
+            time.sleep(2)
+            ball.ball.x = 350
+            ball.ball.y = 250
 
-#-------------------------------------------------------------------
 player1 = Player1('Josh')
 player2 = Player2('Marcin')
 ball = Ball()
+
+def draw_net():
+    net = []
+    j = 0
+    for i in range(0,50):
+        element = pygame.Rect(350, 2 + j, 7, 12)
+        net.append(element)
+        j += 22
+
+    for element in net:
+        pygame.draw.rect(screen, 'white', element)
+
 
 def display_points():
     player1_points_display = font1.render(str(player1.points), False, (0,0,255))
@@ -127,6 +144,8 @@ while True:
                 sys.exit()
 
         player_velocity = 5
+        if player1.points == 5 or player2.points == 5:
+            ball.game_active = False
 
         if Player1.player.bottom < 500:
             if pygame.key.get_pressed()[pygame.K_x]:
@@ -143,6 +162,7 @@ while True:
                 Player2.player.y += player_velocity
 
         screen.fill('black')
+        draw_net()
         player1.draw_player()
         player2.draw_player()
         ball.move_ball()
@@ -150,21 +170,16 @@ while True:
         pygame.display.update()
         Clock.tick(60)
     else:
-        screen.fill((0,0,0))
-        display_points()
+        game_over()
+
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if pygame.key.get_pressed() [pygame.K_SPACE]:
+                    player1.points = 0
+                    player2.points = 0
+                    ball.ball.x = 350
+                    ball.ball.y = 350
+                    ball.game_active = True
+
         pygame.display.update()
-        time.sleep(2)
-        ball.ball.x = 350
-        ball.ball.y = 250
-        if player1.points < 5 and player2.points < 5:
-            ball.game_active = True
-        else:
-            game_over()
-            pygame.display.update()
-            if pygame.key.get_pressed()[pygame.K_SPACE]:
-                print("asd")
-                player1.points = 0
-                player2.points = 0
-                ball.ball.x = 350
-                ball.ball.y = 350
-            sys.exit()
+
