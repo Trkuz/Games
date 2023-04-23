@@ -11,8 +11,8 @@ player_pos_x = 48
 player_pos_y = 483
 ptero_timer = pygame.USEREVENT + 1
 cactus_timer = pygame.USEREVENT + 2
-pygame.time.set_timer(cactus_timer, random.randint(1000,2000))
-pygame.time.set_timer(ptero_timer, random.randint(2000,5000))
+pygame.time.set_timer(cactus_timer, random.randint(1500,3000))
+pygame.time.set_timer(ptero_timer, random.randint(4000,5000))
 
 class Player:
 
@@ -36,7 +36,6 @@ class Player:
 
 class Obstacles:
     def spawn_ptero(self):
-        print('elo')
         height = [ 400,468, 500]
         ptero_y = random.choice(height)
         ptero_x = 1200
@@ -50,13 +49,14 @@ class Obstacles:
     def spawn_cactus(self):
         cactus_y = 540
         cactus_x = 1200
-        global cactus_surf
-        cactus_surf = random.choice([pygame.image.load('cactus/cactus1.png').convert_alpha(),
-                                     pygame.image.load('cactus/cactus2.png').convert_alpha(),
-                                     pygame.image.load('cactus/cactus3.png').convert_alpha()])
+        cactus_surf = random.choice([pygame.transform.scale(pygame.image.load('cactus/cactus1.png').convert_alpha(),(40,84)),
+                                     pygame.transform.scale(pygame.image.load('cactus/cactus2.png').convert_alpha(),(80,84)),
+                                     pygame.transform.scale(pygame.image.load('cactus/cactus3.png').convert_alpha(),(120,84))])
 
-        global cactus_surf_rect
         cactus_surf_rect = cactus_surf.get_rect(bottomright = (cactus_x,cactus_y))
+
+        return cactus_surf, cactus_surf_rect
+
 
     def move_obstacles_ptero(self, obstacle_list):
         if obstacle_list:
@@ -69,13 +69,13 @@ class Obstacles:
         else:
             return []
 
-    def move_obstalces_cactus(self,obstacle_list ):
+    def move_obstalces_cactus(self,obstacle_list):
         if obstacle_list:
-            for element in obstacle_list:
-                element.x -= 5
-                screen.blit(cactus_surf, element)
+            for (x,y) in obstacle_list:
+                y.x -= 6
+                screen.blit(x, y)
 
-            obstacle_list = [element for element in obstacle_list if element.right > -100]
+            obstacle_list = [(x,y) for (x,y) in obstacle_list if y.right > -100]
             return obstacle_list
         else:
             return []
@@ -108,13 +108,11 @@ while True:
     if crouch_index > 2:
         crouch_index = 0
 
-    move_bg -= 5
-    if move_bg < 6:
+    move_bg -= 6
+    if move_bg < 7:
         move_bg = 1200
 
     obstacles.spawn_ptero()
-
-
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -122,15 +120,15 @@ while True:
         if event.type == ptero_timer:
             obstacle_list_ptero.append(ptero_surf_rect)
         if event.type == cactus_timer:
-            obstacles.spawn_cactus()
-            obstacle_list_cactus.append(cactus_surf_rect)
+            x, y = obstacles.spawn_cactus()
+            obstacle_list_cactus.append((x,y))
 
     if player_pos_y >= 483:
         player_pos_y = 483
 
     if player_pos_y == 483:
         if pygame.key.get_pressed()[K_SPACE]:
-            gravity = -20
+            gravity = -25
         elif pygame.key.get_pressed()[K_UP]:
             gravity = -20
 
