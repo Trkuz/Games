@@ -25,6 +25,8 @@ class Player:
         player_surf_rect.center = ((player_pos_x,player_pos_y))
         screen.blit(player_surf,player_surf_rect)
 
+        return player_surf_rect
+
     def draw_player_crouch(self):
         player_frames = [pygame.image.load('dino/dinoc1.png').convert_alpha(),
                          pygame.image.load('dino/dinoc2.png').convert_alpha()]
@@ -33,6 +35,7 @@ class Player:
         player_surf_rect.center = ((player_pos_x,player_pos_y+13))
         screen.blit(player_surf,player_surf_rect)
 
+        return player_surf_rect
 
 class Obstacles:
     def spawn_ptero(self):
@@ -58,33 +61,31 @@ class Obstacles:
         return cactus_surf, cactus_surf_rect
 
 
-    def move_obstacles_ptero(self, obstacle_list):
+    def move_obstacles_ptero(self, obstacle_list, rect1):
         if obstacle_list:
             for element in obstacle_list:
                 element.x -= 7
                 screen.blit(ptero_surf, element)
+                if element.colliderect(rect1):
+                    sys.exit()
 
             obstacle_list = [element for element in obstacle_list if element.x > -100]
             return obstacle_list
         else:
             return []
 
-    def move_obstalces_cactus(self,obstacle_list):
+    def move_obstalces_cactus(self,obstacle_list, rect1):
         if obstacle_list:
             for (x,y) in obstacle_list:
                 y.x -= 6
                 screen.blit(x, y)
+                if y.colliderect(rect1):
+                    sys.exit()
 
             obstacle_list = [(x,y) for (x,y) in obstacle_list if y.right > -100]
             return obstacle_list
         else:
             return []
-
-    def draw_cactus(self):
-        pass
-
-    def collide(self):
-        pass
 
 player = Player()
 obstacles = Obstacles()
@@ -113,6 +114,7 @@ while True:
         move_bg = 1200
 
     obstacles.spawn_ptero()
+    #obstacles.collide()
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -135,12 +137,14 @@ while True:
     backgroundRect.center = (move_bg, 550)
     screen.fill('white')
     screen.blit(background, backgroundRect)
-    obstacle_list_ptero = obstacles.move_obstacles_ptero(obstacle_list_ptero)
-    obstacle_list_cactus = obstacles.move_obstalces_cactus(obstacle_list_cactus)
+
     if pygame.key.get_pressed()[K_DOWN]:
-        player.draw_player_crouch()
+        rect1 = player.draw_player_crouch()
     else:
-        player.draw_player()
+        rect1 = player.draw_player()
+
+    obstacle_list_ptero = obstacles.move_obstacles_ptero(obstacle_list_ptero, rect1)
+    obstacle_list_cactus = obstacles.move_obstalces_cactus(obstacle_list_cactus, rect1)
 
     pygame.display.flip()
     clock.tick(60)
