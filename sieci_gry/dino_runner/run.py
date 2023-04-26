@@ -12,7 +12,7 @@ player_pos_y = 483
 ptero_timer = pygame.USEREVENT + 1
 cactus_timer = pygame.USEREVENT + 2
 pygame.time.set_timer(cactus_timer, random.randint(1500,3000))
-pygame.time.set_timer(ptero_timer, random.randint(4000,5000))
+pygame.time.set_timer(ptero_timer, random.randint(6000,8000))
 
 class Player:
 
@@ -32,7 +32,7 @@ class Player:
                          pygame.image.load('dino/dinoc2.png').convert_alpha()]
         player_surf = player_frames[int(crouch_index)]
         player_surf_rect = player_surf.get_rect()
-        player_surf_rect.center = ((player_pos_x,player_pos_y+13))
+        player_surf_rect.center = ((player_pos_x,player_pos_y+17))
         screen.blit(player_surf,player_surf_rect)
 
         return player_surf_rect
@@ -54,7 +54,7 @@ class Obstacles:
         cactus_x = 1200
         cactus_surf = random.choice([pygame.transform.scale(pygame.image.load('cactus/cactus1.png').convert_alpha(),(40,84)),
                                      pygame.transform.scale(pygame.image.load('cactus/cactus2.png').convert_alpha(),(80,84)),
-                                     pygame.transform.scale(pygame.image.load('cactus/cactus3.png').convert_alpha(),(120,84))])
+                                     pygame.transform.scale(pygame.image.load('cactus/cactus3.png').convert_alpha(),(108,70))])
 
         cactus_surf_rect = cactus_surf.get_rect(bottomright = (cactus_x,cactus_y))
 
@@ -64,7 +64,7 @@ class Obstacles:
     def move_obstacles_ptero(self, obstacle_list, rect1):
         if obstacle_list:
             for element in obstacle_list:
-                element.x -= 7
+                element.x -= 8
                 screen.blit(ptero_surf, element)
                 if element.colliderect(rect1):
                     sys.exit()
@@ -77,7 +77,7 @@ class Obstacles:
     def move_obstalces_cactus(self,obstacle_list, rect1):
         if obstacle_list:
             for (x,y) in obstacle_list:
-                y.x -= 6
+                y.x -= 7
                 screen.blit(x, y)
                 if y.colliderect(rect1):
                     sys.exit()
@@ -109,8 +109,8 @@ while True:
     if crouch_index > 2:
         crouch_index = 0
 
-    move_bg -= 6
-    if move_bg < 7:
+    move_bg -= 7
+    if move_bg < 8:
         move_bg = 1200
 
     obstacles.spawn_ptero()
